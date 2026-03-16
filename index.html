@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عالم غزل الساحر</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&display=swap');
+        :root { --main-color: #ff4d6d; }
+        body { margin: 0; font-family: 'Cairo', sans-serif; text-align: center; color: white; user-select: none; overflow-x: hidden;
+            background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #ffd1ff); background-size: 400% 400%; animation: gradient 15s ease infinite; }
+        @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        #login-screen { position: fixed; inset: 0; background: #fff0f3; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; transition: 1s; color: #c9184a; }
+        #main-content { display: none; padding-bottom: 100px; }
+        
+        button { background: var(--main-color); color: white; border: none; padding: 12px 35px; border-radius: 30px; cursor: pointer; font-size: 18px; font-weight: bold; margin: 10px; transition: 0.3s; box-shadow: 0 4px 15px rgba(255, 77, 109, 0.4); }
+
+        /* بصمة القلب */
+        .fingerprint-area { width: 150px; height: 150px; margin: 40px auto; background: rgba(255,255,255,0.2); border-radius: 50%; border: 3px dashed white; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; }
+        .fingerprint-icon { font-size: 60px; z-index: 2; }
+        .pulse-ring { position: absolute; width: 100%; height: 100%; border: 2px solid white; border-radius: 50%; animation: pulseRing 2s infinite; opacity: 0; }
+        @keyframes pulseRing { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        /* مقياس الحب */
+        .love-meter-container { width: 90%; max-width: 500px; height: 30px; background: rgba(255,255,255,0.3); border-radius: 20px; margin: 20px auto; overflow: hidden; display: none; border: 2px solid white; }
+        #love-bar { width: 0%; height: 100%; background: linear-gradient(to right, #ff4d6d, #ff0054); transition: 0.1s; }
+        #love-limit-msg { display: none; font-size: 24px; font-weight: 900; color: #ff0054; margin-top: 10px; animation: fadeIn 1s; }
+
+        .big-love-letter { background: rgba(255,255,255,0.9); color: #c9184a; padding: 30px; border-radius: 25px; margin: 20px; border: 3px solid var(--main-color); }
+        .heart-particle { position: fixed; pointer-events: none; animation: fly 3s forwards; }
+        @keyframes fly { to { transform: translateY(-500px) scale(2); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop><source src="https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Ketsa/Raising_Frequency/Ketsa_-_09_-_Flowing_With_The_Current.mp3" type="audio/mpeg"></audio>
+
+    <div id="login-screen">
+        <h1 style="font-size: 50px;">🔐</h1>
+        <h2>اكتبي ghazal يا روحي</h2>
+        <input type="text" id="passInput" style="padding:15px; border-radius:20px; border:2px solid #ff4d6d; text-align:center;" placeholder="اسمك هنا...">
+        <button onclick="checkPass()">دخول 💖</button>
+    </div>
+
+    <div id="main-content">
+        <img src="pic1.jpg" style="width: 180px; height: 180px; border-radius: 50%; border: 5px solid white; margin-top: 40px;" onerror="this.src='https://via.placeholder.com/150'">
+        
+        <h2 style="margin-top: 30px;">قياسي حبك في قلبي ✨</h2>
+        <button id="meterBtn" onclick="startLoveMeter()">اضغطي للقياس ❤️</button>
+        <div class="love-meter-container" id="meterBox">
+            <div id="love-bar"></div>
+        </div>
+        <div id="love-limit-msg">حبي لكي ليس له حدود ❤️♾️</div>
+
+        <h2 style="margin-top: 50px;">بصمة قلبك 💍</h2>
+        <p>ثبتي صباعك هنا يا أغلى غزل :</p>
+        <div class="fingerprint-area" id="fingerArea" onmousedown="startPulse()" ontouchstart="startPulse()" onmouseup="stopPulse()" ontouchend="stopPulse()">
+            <div class="fingerprint-icon">☝️</div>
+            <div id="rings"></div>
+        </div>
+
+        <div class="big-love-letter">
+            <div id="typewriterLove"></div>
+        </div>
+
+        <a href="https://wa.me/201095098804" style="background:#25d366; color:white; text-decoration:none; padding:15px 30px; border-radius:30px; display:inline-block;">كلميني واتساب 💚</a>
+    </div>
+
+    <script>
+        const loveLetter = "يا أغلى غزل في الدنيا، بصمتك محفورة في قلبي وحبي ليكي بيزيد كل ثانية.. انتي نصي التاني وكل دنيتي.. ❤️💍";
+        let typingIndex = 0;
+
+        function checkPass() {
+            if (document.getElementById('passInput').value.toLowerCase() === "ghazal") {
+                document.getElementById('bgMusic').play();
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+                startTypewriter();
+            }
+        }
+
+        function startTypewriter() {
+            if (typingIndex < loveLetter.length) {
+                document.getElementById('typewriterLove').innerHTML += loveLetter.charAt(typingIndex);
+                typingIndex++;
+                setTimeout(startTypewriter, 100);
+            }
+        }
+
+        function startLoveMeter() {
+            const btn = document.getElementById('meterBtn');
+            const box = document.getElementById('meterBox');
+            const bar = document.getElementById('love-bar');
+            const msg = document.getElementById('love-limit-msg');
+            btn.style.display = 'none';
+            box.style.display = 'block';
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                    msg.style.display = 'block';
+                } else {
+                    width++;
+                    bar.style.width = width + '%';
+                }
+            }, 30);
+        }
+
+        let pulseInterval;
+        function startPulse() {
+            document.getElementById('rings').innerHTML = '<div class="pulse-ring"></div><div class="pulse-ring" style="animation-delay: 0.5s"></div>';
+            pulseInterval = setInterval(() => {
+                const h = document.createElement('div');
+                h.className = 'heart-particle';
+                h.innerHTML = '❤️';
+                h.style.left = Math.random() * 100 + 'vw';
+                h.style.top = '80vh';
+                document.body.appendChild(h);
+                setTimeout(() => h.remove(), 3000);
+            }, 200);
+        }
+
+        function stopPulse() {
+            document.getElementById('rings').innerHTML = '';
+            clearInterval(pulseInterval);
+        }
+    </script>
+</body>
+  </html>
